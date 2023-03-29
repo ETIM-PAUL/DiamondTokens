@@ -11,6 +11,11 @@
     Modal,
   } from "flowbite-svelte";
   import { HandThumbDown, HandThumbUp } from "svelte-heros";
+  import truncateEthAddress from "truncate-eth-address";
+
+  export let isWalletInstalled, connectWallet, loading, account;
+
+  let truncatedAccount = account === null ? null : truncateEthAddress(account);
 
   let defaultModal = false;
   let navClass =
@@ -33,15 +38,37 @@
         DiamondLabs
       </span>
     </NavBrand>
-    <div class="flex items-center lg:order-2">
-      <a href="/">
-        <button color="dark">Connect Wallet</button>
-      </a>
-      <NavHamburger
-        on:click={toggle}
-        btnClass="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-      />
-    </div>
+
+    {#if isWalletInstalled}
+      <div class="flex items-center lg:order-2">
+        {#if isWalletInstalled && truncatedAccount === null}
+          <button on:click={connectWallet} color="dark">
+            Connect Wallet
+          </button>
+        {:else}
+          <button on:click={connectWallet} color="dark">
+            {truncatedAccount}
+          </button>
+        {/if}
+        <NavHamburger
+          on:click={toggle}
+          btnClass="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        />
+      </div>
+    {:else}
+      <div class="flex items-center lg:order-2">
+        <a
+          href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn"
+        >
+          <button color="dark">Install Wallet</button>
+        </a>
+        <NavHamburger
+          on:click={toggle}
+          btnClass="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        />
+      </div>
+    {/if}
+
     <NavUl
       {hidden}
       divClass="justify-between items-center w-full lg:flex lg:w-auto lg:order-1"
