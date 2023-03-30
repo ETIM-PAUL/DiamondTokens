@@ -29,6 +29,8 @@
   async function getBalance() {
     if ($account !== null || $account !== undefined) {
       balanceOwner($account).then((result) => (balance = result));
+    } else {
+      balance = 0;
     }
   }
 

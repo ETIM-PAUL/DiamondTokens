@@ -59,7 +59,7 @@
   let loadingDelegate = false;
 
   // transferToken
-  function transferDiamond() {
+  async function transferDiamond() {
     if (_receiver === "" || _receiver === undefined || _receiver === null) {
       alert("Please Enter Recipient Address");
     }
@@ -71,14 +71,13 @@
       amount,
     };
     loadingTransaction = true;
-    const result = transferDiamondTokens(values, loadingTransaction);
-    console.log(result.then((result) => console.log(result)));
-
+    const result = await transferDiamondTokens(values, loadingTransaction);
     loadingTransaction = false;
+    defaultModal = false;
   }
 
   // assign Delegate
-  function appointRep() {
+  async function appointRep() {
     if (_delegate === "" || _delegate === undefined || _delegate === null) {
       alert("Please Enter Representative Address");
     }
@@ -90,9 +89,9 @@
       delegateAmount,
     };
     loadingDelegate = true;
-    const result = approveDelegate(values, loadingTransaction);
-    console.log(result.then((result) => console.log(result)));
+    const result = await approveDelegate(values, loadingTransaction);
     loadingDelegate = false;
+    repModal = false;
   }
 
   // transaction history
@@ -149,7 +148,7 @@
       </span>
       <span
         class="self-center whitespace-nowrap text-xs font-semibold dark:text-white mt-1 ml-1"
-        >{balance}DND</span
+        >{balance > 0 ? balance : 0}DND</span
       >
     </NavBrand>
 
@@ -230,7 +229,7 @@
         class="flex items-center space-x-3 sm:space-x-4"
         on:click={transferDiamond}
       >
-        <Button>
+        <Button disabled={loadingTransaction}>
           <HandThumbUp class="pr-2" />
 
           {#if !loadingTransaction}
@@ -277,10 +276,10 @@
         class="flex items-center space-x-3 sm:space-x-4"
         on:click={appointRep}
       >
-        <Button>
+        <Button disabled={loadingDelegate}>
           <HandThumbUp class="pr-2" />
 
-          {#if !loadingTransaction}
+          {#if !loadingDelegate}
             Delegate
           {:else}
             Delegating
