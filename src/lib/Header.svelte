@@ -200,9 +200,9 @@
       <table class="table-auto border rounded-md p-2">
         <thead class="p-2">
           <tr class="border">
-            <th class="border"> address </th>
-            <th class="border"> amount </th>
-            <th class="border"> timestamp </th>
+            <th class="border p-1"> address </th>
+            <th class="border p-1"> amount </th>
+            <th class="border p-1"> date </th>
           </tr>
         </thead>
         <tbody class="p-2">
@@ -216,7 +216,6 @@
               </td>
               <td class="border">
                 {formatTimestamp(time)}
-                {time}
               </td>
             </tr>
           {/each}

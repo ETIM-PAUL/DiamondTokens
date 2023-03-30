@@ -1,5 +1,7 @@
 import axios from "axios";
 import { ethers } from "ethers";
+import { Datepicker } from "flowbite-svelte";
+import unix from "moment";
 import abi from "../utils/DiamondLab.json";
 
 const contractAddress = "0x9fe147c23600CFcB7dd0DAEc4670d96868142744";
@@ -53,10 +55,8 @@ export const transferHistoryDetails = async () => {
   }
 };
 
-export const formatTimestamp = (time) => {
-  const date = new Date(1680146532);
-  console.log(date)
-  console.log(time)
-  const dateFormat = date.getHours() + ":" + date.getMinutes() + ", " + date.toDateString();
-  return dateFormat
+export const formatTimestamp = (timestamp) => {
+  const time = unix(timestamp)
+  const date = time.toString()
+  return date;
 }
