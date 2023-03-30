@@ -224,40 +224,54 @@
         <h3 class="font-semibold ">Transfer Diamond Tokens</h3>
       </div>
     </div>
-    <div>
-      <Input
-        placeholder={`Reciever's Wallet Address`}
-        bind:value={_receiver}
-        class="mb-2"
-      />
-      <Input placeholder={`Tokens Amount`} type="number" bind:value={amount} />
-    </div>
-    <div class="flex justify-between items-center gap-3">
-      <div
-        class="flex items-center space-x-3 sm:space-x-4"
-        on:click={transferDiamond}
-      >
-        <Button disabled={loadingTransaction}>
-          <HandThumbUp class="pr-2" />
 
-          {#if !loadingTransaction}
-            Transfer
-          {:else}
-            Transferring
-          {/if}
-        </Button>
+    {#if !isWalletInstalled || (isWalletInstalled && truncatedAccount !== null)}
+      <div>
+        <Input
+          placeholder={`Reciever's Wallet Address`}
+          bind:value={_receiver}
+          class="mb-2"
+        />
+        <Input
+          placeholder={`Tokens Amount`}
+          type="number"
+          bind:value={amount}
+        />
       </div>
+      <div class="flex justify-between items-center gap-3">
+        <div
+          class="flex items-center space-x-3 sm:space-x-4"
+          on:click={transferDiamond}
+        >
+          <Button disabled={loadingTransaction}>
+            <HandThumbUp class="pr-2" />
 
-      <div
-        class="flex items-center space-x-3 sm:space-x-4"
-        on:click={hideModal}
-      >
-        <Button color="red">
-          <HandThumbDown class="pr-2" />
-          Cancel
-        </Button>
+            {#if !loadingTransaction}
+              Transfer
+            {:else}
+              Transferring
+            {/if}
+          </Button>
+        </div>
+
+        <div
+          class="flex items-center space-x-3 sm:space-x-4"
+          on:click={hideModal}
+        >
+          <Button color="red">
+            <HandThumbDown class="pr-2" />
+            Cancel
+          </Button>
+        </div>
       </div>
-    </div>
+    {:else}
+      <div />
+      <span class="block">Wallet not connected</span>
+      <Button color="red" on:click={() => (defaultModal = false)}>
+        <HandThumbDown class="pr-2" />
+        Close
+      </Button>
+    {/if}
   </Modal>
 
   <!-- delegate funds -->
@@ -267,44 +281,54 @@
         <h3 class="font-semibold ">Delegate Diamond Tokens tp 3rd Party</h3>
       </div>
     </div>
-    <div>
-      <Input
-        placeholder={`3rd Party's Wallet Address`}
-        bind:value={_delegate}
-        class="mb-2"
-      />
-      <Input
-        placeholder={`Tokens Amount`}
-        type="number"
-        bind:value={delegateAmount}
-      />
-    </div>
-    <div class="flex justify-between items-center gap-3">
-      <div
-        class="flex items-center space-x-3 sm:space-x-4"
-        on:click={appointRep}
-      >
-        <Button disabled={loadingDelegate}>
-          <HandThumbUp class="pr-2" />
 
-          {#if !loadingDelegate}
-            Delegate
-          {:else}
-            Delegating
-          {/if}
-        </Button>
+    {#if !isWalletInstalled || (isWalletInstalled && truncatedAccount !== null)}
+      <div>
+        <Input
+          placeholder={`3rd Party's Wallet Address`}
+          bind:value={_delegate}
+          class="mb-2"
+        />
+        <Input
+          placeholder={`Tokens Amount`}
+          type="number"
+          bind:value={delegateAmount}
+        />
       </div>
+      <div class="flex justify-between items-center gap-3">
+        <div
+          class="flex items-center space-x-3 sm:space-x-4"
+          on:click={appointRep}
+        >
+          <Button disabled={loadingDelegate}>
+            <HandThumbUp class="pr-2" />
 
-      <div
-        class="flex items-center space-x-3 sm:space-x-4"
-        on:click={() => (repModal = false)}
-      >
-        <Button color="red">
-          <HandThumbDown class="pr-2" />
-          Cancel
-        </Button>
+            {#if !loadingDelegate}
+              Delegate
+            {:else}
+              Delegating
+            {/if}
+          </Button>
+        </div>
+
+        <div
+          class="flex items-center space-x-3 sm:space-x-4"
+          on:click={() => (repModal = false)}
+        >
+          <Button color="red">
+            <HandThumbDown class="pr-2" />
+            Cancel
+          </Button>
+        </div>
       </div>
-    </div>
+    {:else}
+      <div />
+      <span class="block">Wallet not connected</span>
+      <Button color="red" on:click={() => (repModal = false)}>
+        <HandThumbDown class="pr-2" />
+        Close
+      </Button>
+    {/if}
   </Modal>
 
   <!-- show reps list -->
