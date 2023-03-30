@@ -1,15 +1,14 @@
 import axios from "axios";
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 import { Datepicker } from "flowbite-svelte";
 import unix from "moment";
 import abi from "../utils/DiamondLab.json";
 
 const contractAddress = "0x9fe147c23600CFcB7dd0DAEc4670d96868142744";
 const contractABI = abi.abi;
-let provider;
 
-const browserProvider = new ethers.providers.Web3Provider(window.ethereum);
-provider = browserProvider;
+const provider = ((window.ethereum != null) ? new ethers.providers.Web3Provider(window.ethereum) : ethers.providers.getDefaultProvider());
+
 
 export const getBalance = async (address) => {
   if (address !== null) {
