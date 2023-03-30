@@ -74,6 +74,17 @@ export const transferHistoryDetails = async () => {
     console.log(error);
   }
 };
+export const delegateList = async () => {
+  try {
+    const signer = provider.getSigner();
+    const transferToken = new ethers.Contract(contractAddress, contractABI, signer);
+    const allReps = await transferToken.totalReps();
+
+    return allReps;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const formatTimestamp = (timestamp) => {
   const time = unix(timestamp)

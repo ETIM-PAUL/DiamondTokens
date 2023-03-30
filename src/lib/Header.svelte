@@ -16,6 +16,7 @@
   import {
     approveDelegate,
     balanceOwner,
+    delegateList,
     formatTimestamp,
     transferDiamondTokens,
     transferHistoryDetails,
@@ -31,9 +32,13 @@
 
   let repModal = false;
 
+  let repListModal = false;
+
   let loadingHistory = true;
 
   let transactionHistory = [];
+
+  let delegates = [];
 
   // set amount
   let amount = null;
@@ -94,9 +99,16 @@
   const getHistory = async () => {
     historyModal = true;
     const result = await transferHistoryDetails();
-    console.log(result);
     transactionHistory = result;
     loadingHistory = false;
+  };
+
+  // delegates assigned
+  const getDelegates = async () => {
+    repListModal = true;
+    const result = await delegateList();
+    delegates = result;
+    loadingDelegate = false;
   };
 
   // hide modal
@@ -109,6 +121,11 @@
   // hide history modal
   function hideHistoryModal() {
     historyModal = false;
+  }
+
+  // hide delegate list modal
+  function hideDelegatesModal() {
+    repListModal = false;
   }
 
   let navClass =
@@ -186,7 +203,10 @@
       >
         Approve 3rd Party Agent
       </p>
-      <NavLi href="/">3rd Parties</NavLi>
+
+      <p on:click={getDelegates} class="hover:cursor-pointer hover:underline">
+        3rd Parties
+      </p>
     </NavUl>
   </Navbar>
 
@@ -279,6 +299,55 @@
       </div>
     </div>
   </Modal>
+
+  <!-- show reps list -->
+  <Modal title="" bind:open={repListModal} size="md">
+    <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+      <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+        <h3 class="font-semibold ">All of your Delegates</h3>
+      </div>
+    </div>
+    {#if delegates.length > 0 && !loadingDelegate}
+      <table class="table-auto border rounded-md p-2">
+        <thead class="p-2">
+          <tr class="border">
+            <th class="border p-1"> address </th>
+            <th class="border p-1"> amount given </th>
+          </tr>
+        </thead>
+        <tbody class="p-2">
+          {#each delegates as { _rep, balance }, i}
+            <tr class="border">
+              <td class="border">
+                {truncateEthAddress(_rep)}
+              </td>
+              <td class="border">
+                {balance}DND
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/if}
+    {#if loadingDelegate}
+      <span>Loading Data</span>
+    {/if}
+    {#if !loadingDelegate && delegates.length == 0}
+      <span>No Delegate</span>
+    {/if}
+    <div />
+    <div class="flex justify-between items-center gap-3">
+      <div
+        class="flex items-center space-x-3 sm:space-x-4"
+        on:click={hideDelegatesModal}
+      >
+        <Button color="red">
+          <HandThumbDown class="pr-2" />
+          Close
+        </Button>
+      </div>
+    </div></Modal
+  >
 
   <!-- show transfer history -->
   <Modal title="" bind:open={historyModal} size="md">
