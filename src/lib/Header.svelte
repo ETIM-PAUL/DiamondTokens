@@ -97,17 +97,25 @@
   // transaction history
   const getHistory = async () => {
     historyModal = true;
-    const result = await transferHistoryDetails();
-    transactionHistory = result;
-    loadingHistory = false;
+    if (truncatedAccount === null || truncatedAccount === undefined) {
+      loadingHistory = false;
+    } else {
+      const result = await transferHistoryDetails();
+      transactionHistory = result;
+      loadingHistory = false;
+    }
   };
 
   // delegates assigned
   const getDelegates = async () => {
     repListModal = true;
-    const result = await delegateList();
-    delegates = result;
-    loadingDelegate = false;
+    if (truncatedAccount === null || truncatedAccount === undefined) {
+      loadingDelegate = false;
+    } else {
+      const result = await delegateList();
+      delegates = result;
+      loadingDelegate = false;
+    }
   };
 
   // hide modal
@@ -306,7 +314,7 @@
         <h3 class="font-semibold ">All of your Delegates</h3>
       </div>
     </div>
-    {#if delegates.length > 0 && !loadingDelegate}
+    {#if delegates?.length > 0 && !loadingDelegate}
       <table class="table-auto border rounded-md p-2">
         <thead class="p-2">
           <tr class="border">
