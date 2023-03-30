@@ -6,11 +6,13 @@
 
   import { persist, createLocalStorage } from "@macfja/svelte-persistent-store";
   import { writable } from "svelte/store";
+  import { balanceOwner } from "./utils/utils";
 
   let account = persist(writable(null), createLocalStorage(), "account");
 
   let isWalletInstalled = false;
   let loading = false;
+  let balance = 0;
 
   onMount(() => {
     if (window.ethereum) {
@@ -19,7 +21,16 @@
     } else {
       alert("Please Installed Metatask");
     }
+    (async () => {
+      await getBalance();
+    })();
   });
+
+  async function getBalance() {
+    if ($account !== null || $account !== undefined) {
+      balanceOwner($account).then((result) => (balance = result));
+    }
+  }
 
   async function connectWallet() {
     loading = true;
@@ -30,7 +41,6 @@
         })
         .then((accounts) => {
           $account = accounts[0];
-          console.log(account);
         })
         .catch((error) => {
           alert("Something went wrong");
@@ -40,7 +50,13 @@
   }
 </script>
 
-<Header account={$account} {isWalletInstalled} {connectWallet} {loading} />
+<Header
+  account={$account}
+  {isWalletInstalled}
+  {connectWallet}
+  {loading}
+  {balance}
+/>
 <Body />
 
 <style>

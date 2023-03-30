@@ -14,18 +14,22 @@
   import truncateEthAddress from "truncate-eth-address";
 
   import {
+    approveDelegate,
+    balanceOwner,
     formatTimestamp,
     transferDiamondTokens,
     transferHistoryDetails,
   } from "../utils/utils";
 
-  export let isWalletInstalled, connectWallet, loading, account;
+  export let isWalletInstalled, connectWallet, loading, account, balance;
 
   let truncatedAccount = account === null ? null : truncateEthAddress(account);
 
   let defaultModal = false;
 
   let historyModal = false;
+
+  let repModal = false;
 
   let loadingHistory = true;
 
@@ -37,8 +41,17 @@
   // set receiver
   let _receiver = "";
 
-  // set receiver
+  // set amount
+  let delegateAmount = null;
+
+  // set delegate
+  let _delegate = "";
+
+  // set transferState
   let loadingTransaction = false;
+
+  // set approveDelegate state
+  let loadingDelegate = false;
 
   // transferToken
   function transferDiamond() {
@@ -52,7 +65,29 @@
       _receiver,
       amount,
     };
-    transferDiamondTokens(values, loadingTransaction);
+    loadingTransaction = true;
+    const result = transferDiamondTokens(values, loadingTransaction);
+    console.log(result.then((result) => console.log(result)));
+
+    loadingTransaction = false;
+  }
+
+  // assign Delegate
+  function appointRep() {
+    if (_delegate === "" || _delegate === undefined || _delegate === null) {
+      alert("Please Enter Representative Address");
+    }
+    if (delegateAmount === 0 || delegateAmount === null) {
+      alert("Please Enter Amount of Tokens greater than 0");
+    }
+    const values = {
+      _delegate,
+      delegateAmount,
+    };
+    loadingDelegate = true;
+    const result = approveDelegate(values, loadingTransaction);
+    console.log(result.then((result) => console.log(result)));
+    loadingDelegate = false;
   }
 
   // transaction history
@@ -95,6 +130,10 @@
       >
         DiamondLabs
       </span>
+      <span
+        class="self-center whitespace-nowrap text-xs font-semibold dark:text-white mt-1 ml-1"
+        >{balance}DND</span
+      >
     </NavBrand>
 
     {#if isWalletInstalled}
@@ -141,7 +180,12 @@
       <p on:click={getHistory} class="hover:cursor-pointer hover:underline">
         History
       </p>
-      <NavLi href="/">Approve 3rd Party Agent</NavLi>
+      <p
+        on:click={() => (repModal = true)}
+        class="hover:cursor-pointer hover:underline"
+      >
+        Approve 3rd Party Agent
+      </p>
       <NavLi href="/">3rd Parties</NavLi>
     </NavUl>
   </Navbar>
@@ -180,6 +224,53 @@
       <div
         class="flex items-center space-x-3 sm:space-x-4"
         on:click={hideModal}
+      >
+        <Button color="red">
+          <HandThumbDown class="pr-2" />
+          Cancel
+        </Button>
+      </div>
+    </div>
+  </Modal>
+
+  <!-- delegate funds -->
+  <Modal title="" bind:open={repModal} size="md">
+    <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+      <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+        <h3 class="font-semibold ">Delegate Diamond Tokens tp 3rd Party</h3>
+      </div>
+    </div>
+    <div>
+      <Input
+        placeholder={`3rd Party's Wallet Address`}
+        bind:value={_delegate}
+        class="mb-2"
+      />
+      <Input
+        placeholder={`Tokens Amount`}
+        type="number"
+        bind:value={delegateAmount}
+      />
+    </div>
+    <div class="flex justify-between items-center gap-3">
+      <div
+        class="flex items-center space-x-3 sm:space-x-4"
+        on:click={appointRep}
+      >
+        <Button>
+          <HandThumbUp class="pr-2" />
+
+          {#if !loadingTransaction}
+            Delegate
+          {:else}
+            Delegating
+          {/if}
+        </Button>
+      </div>
+
+      <div
+        class="flex items-center space-x-3 sm:space-x-4"
+        on:click={() => (repModal = false)}
       >
         <Button color="red">
           <HandThumbDown class="pr-2" />

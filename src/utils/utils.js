@@ -35,11 +35,31 @@ export const transferDiamondTokens = async (values, loadingTransaction) => {
     );
 
     await sendTokens.wait();
-    loadingTransaction = false;
     alert("Tokens Sent Successfully");
+    loadingTransaction = false;
   } catch (error) {
     console.log(error);
     loadingTransaction = false;
+  }
+};
+export const approveDelegate = async (values, loadingDelegate) => {
+
+  try {
+    loadingDelegate = true;
+
+    const signer = provider.getSigner();
+    const transferToken = new ethers.Contract(contractAddress, contractABI, signer);
+    const approveDel = await transferToken.approveRep(
+      values._delegate,
+      Number(values.delegateAmount)
+    );
+
+    await approveDel.wait();
+    alert("Delegate Approved And Assigned Tokens");
+    loadingDelegate = false;
+  } catch (error) {
+    console.log(error);
+    loadingDelegate = false;
   }
 };
 
@@ -59,4 +79,15 @@ export const formatTimestamp = (timestamp) => {
   const time = unix(timestamp)
   const date = time.toString()
   return date;
+}
+export const balanceOwner = async (owner) => {
+  try {
+    const signer = provider.getSigner();
+    const transferToken = new ethers.Contract(contractAddress, contractABI, signer);
+    const balanceDMD = await transferToken.balanceOf(owner);
+
+    return balanceDMD;
+  } catch (error) {
+    console.log(error);
+  }
 }
