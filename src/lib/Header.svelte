@@ -13,11 +13,69 @@
   import { HandThumbDown, HandThumbUp } from "svelte-heros";
   import truncateEthAddress from "truncate-eth-address";
 
+  import {
+    formatTimestamp,
+    transferDiamondTokens,
+    transferHistoryDetails,
+  } from "../utils/utils";
+
   export let isWalletInstalled, connectWallet, loading, account;
 
   let truncatedAccount = account === null ? null : truncateEthAddress(account);
 
   let defaultModal = false;
+
+  let historyModal = false;
+
+  let loadingHistory = true;
+
+  let transactionHistory = [];
+
+  // set amount
+  let amount = null;
+
+  // set receiver
+  let _receiver = "";
+
+  // set receiver
+  let loadingTransaction = false;
+
+  // transferToken
+  function transferDiamond() {
+    if (_receiver === "" || _receiver === undefined || _receiver === null) {
+      alert("Please Enter Recipient Address");
+    }
+    if (amount === 0 || amount === null) {
+      alert("Please Enter Amount of Tokens greater than 0");
+    }
+    const values = {
+      _receiver,
+      amount,
+    };
+    transferDiamondTokens(values, loadingTransaction);
+  }
+
+  // transaction history
+  const getHistory = async () => {
+    historyModal = true;
+    const result = await transferHistoryDetails();
+    console.log(result);
+    transactionHistory = result;
+    loadingHistory = false;
+  };
+
+  // hide modal
+  function hideModal() {
+    defaultModal = false;
+    _receiver = "";
+    amount = null;
+  }
+
+  // hide history modal
+  function hideHistoryModal() {
+    historyModal = false;
+  }
+
   let navClass =
     "bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800";
   let navDivClass =
@@ -80,34 +138,108 @@
       >
         Transfer
       </p>
-      <NavLi href="/">History</NavLi>
+      <p on:click={getHistory} class="hover:cursor-pointer hover:underline">
+        History
+      </p>
       <NavLi href="/">Approve 3rd Party Agent</NavLi>
       <NavLi href="/">3rd Parties</NavLi>
     </NavUl>
   </Navbar>
 
-  <Modal title="" bind:open={defaultModal} autoclose size="md">
+  <!-- show transfer modal -->
+  <Modal title="" bind:open={defaultModal} size="md">
     <div class="flex justify-between mb-4 rounded-t sm:mb-5">
       <div class="text-lg text-gray-900 md:text-xl dark:text-white">
-        <h3 class="font-semibold ">Transfer JOE</h3>
+        <h3 class="font-semibold ">Transfer Diamond Tokens</h3>
       </div>
     </div>
     <div>
-      <Input placeholder={`Reciever's Wallet Address`} />
-      <Textarea class="mt-2" placeholder={`Additional info`} max={200} />
+      <Input
+        placeholder={`Reciever's Wallet Address`}
+        bind:value={_receiver}
+        class="mb-2"
+      />
+      <Input placeholder={`Tokens Amount`} type="number" bind:value={amount} />
     </div>
     <div class="flex justify-between items-center gap-3">
-      <div class="flex items-center space-x-3 sm:space-x-4">
+      <div
+        class="flex items-center space-x-3 sm:space-x-4"
+        on:click={transferDiamond}
+      >
         <Button>
           <HandThumbUp class="pr-2" />
-          Transfer
+
+          {#if !loadingTransaction}
+            Transfer
+          {:else}
+            Transferring
+          {/if}
         </Button>
       </div>
-      <Button color="red">
-        <HandThumbDown class="pr-2" />
 
-        Cancel
-      </Button>
+      <div
+        class="flex items-center space-x-3 sm:space-x-4"
+        on:click={hideModal}
+      >
+        <Button color="red">
+          <HandThumbDown class="pr-2" />
+          Cancel
+        </Button>
+      </div>
     </div>
   </Modal>
+
+  <!-- show transfer history -->
+  <Modal title="" bind:open={historyModal} size="md">
+    <div class="flex justify-between mb-4 rounded-t sm:mb-5">
+      <div class="text-lg text-gray-900 md:text-xl dark:text-white">
+        <h3 class="font-semibold ">Transaction History</h3>
+      </div>
+    </div>
+    {#if transactionHistory.length > 0 && !loadingHistory}
+      <table class="table-auto border rounded-md p-2">
+        <thead class="p-2">
+          <tr class="border">
+            <th class="border"> address </th>
+            <th class="border"> amount </th>
+            <th class="border"> timestamp </th>
+          </tr>
+        </thead>
+        <tbody class="p-2">
+          {#each transactionHistory as { _to, amount, time }, i}
+            <tr class="border">
+              <td class="border">
+                {truncateEthAddress(_to)}
+              </td>
+              <td class="border">
+                {amount}DND
+              </td>
+              <td class="border">
+                {formatTimestamp(time)}
+                {time}
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/if}
+    {#if loadingHistory}
+      <span>Loading Data</span>
+    {/if}
+    {#if !loadingHistory && transactionHistory.length == 0}
+      <span>No Transaction History</span>
+    {/if}
+    <div />
+    <div class="flex justify-between items-center gap-3">
+      <div
+        class="flex items-center space-x-3 sm:space-x-4"
+        on:click={hideHistoryModal}
+      >
+        <Button color="red">
+          <HandThumbDown class="pr-2" />
+          Close
+        </Button>
+      </div>
+    </div></Modal
+  >
 </header>
